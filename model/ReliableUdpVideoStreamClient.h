@@ -8,6 +8,10 @@
 #include "ns3/traced-callback.h"
 
 namespace ns3 {
+
+class Socket;
+class Packet;
+
 /**
  * \ingroup applications
  * \defgroup reliableudpvideostreamclient ReliableUdpVideoStreamClient
@@ -45,6 +49,22 @@ public:
    * \param addr remote address
    */
   void SetRemote (Address addr);
+
+protected:
+  virtual void DoDispose (void);
+
+private:
+  virtual void StartApplication (void);
+  virtual void StopApplication (void);
+
+  /**
+   * \brief Handle a packet reception.
+   
+   * This function is called by lower layers.
+
+   * \param socket the socket the packet was received to.
+   */
+  void HandleRead (Ptr<Socket> socket);
 };
 
 } // namespace ns3
