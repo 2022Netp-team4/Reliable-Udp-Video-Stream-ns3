@@ -88,6 +88,23 @@ private:
    * This function is called periodically.
    */
   void ConsumePackets (void);
+
+  /**
+   * \brief Request server to stop sending packets.
+
+   * This function is called when the queue which has out-of-order packets is full.
+   */
+  void RequestStop(void);
+
+  /**
+   * \brief Request server to retransmit one or more packets.
+
+   * This function is called when we detect the packet loss.
+
+   * \param from sequence number of loss packet.
+   * \param to sequnce number of received pacekt.
+   */
+  void RequestRetransmit(uint32_t from, uint32_t to); 
 };
 
 } // namespace ns3
