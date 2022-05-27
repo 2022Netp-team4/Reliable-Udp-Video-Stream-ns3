@@ -65,6 +65,14 @@ private:
    * \param socket the socket the packet was received to.
    */
   void HandleRead (Ptr<Socket> socket);
+
+  /**
+   * \brief Remove a header of packet.
+
+   * This function is called by HandleRead.
+
+   * \param packet received packet from server.
+  void RemoveHeader (Ptr<Packet> packet);
 };
 
 } // namespace ns3
