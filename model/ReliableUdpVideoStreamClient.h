@@ -6,6 +6,7 @@
 #include "ns3/ptr.h"
 #include "ns3/address.h"
 #include "ns3/traced-callback.h"
+#include "ns3/queue.h"
 
 namespace ns3 {
 
@@ -104,7 +105,16 @@ private:
    * \param from sequence number of loss packet.
    * \param to sequnce number of received pacekt.
    */
-  void RequestRetransmit(uint32_t from, uint32_t to); 
+  void RequestRetransmit(uint32_t from, uint32_t to);
+
+  Ptr<Socket> m_socket; //!< Socket
+  Address m_peerAddress; //!< Remote peer address
+  uint16_t m_peerPort; //!< Remote peer port
+  Ptr<Queue<Packet>> m_outOfOrderQueue; //!< out-of-order packets queue
+  Ptr<Queue<Packet>> m_inOrderQueue; //!< in-order queue
+  Ptr<Queue<Packet>> m_retransQueue; //!< retrasmitted packets queue
+  EventId m_storeValidatePacketsEvent; //!< Event to store validate packets from out-of-order queue
+  EventId m_consumePacketsEvent; //!< Event to consume packets from in-order queue   
 };
 
 } // namespace ns3
