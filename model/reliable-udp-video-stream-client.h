@@ -63,7 +63,7 @@ private:
    
    * This function is called by lower layers.
 
-   * \param socket the socket the packet was received to.
+   * \param socket the socket which is a packet was received to.
    */
   void HandleRead (Ptr<Socket> socket);
 
