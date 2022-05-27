@@ -30,8 +30,21 @@ public:
   static TypeId GetTypeId (void);
   
   ReliableUdpVideoStreamClient();
-  
+
   virtual ~ReliableUdpVideoStreamClient();
+
+  /**
+   * \brief set the remote address and port
+   * \param ip remote IP address
+   * \param port remote port
+   */  
+  void SetRemote (Address ip, uint16_t port);
+
+  /**
+   * \brief set the remote address
+   * \param addr remote address
+   */
+  void SetRemote (Address addr);
 };
 
 } // namespace ns3
