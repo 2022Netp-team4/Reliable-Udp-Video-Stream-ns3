@@ -8,6 +8,8 @@
 #include "ns3/traced-callback.h"
 #include "ns3/queue.h"
 
+#define MAX_QUEUE_SIZE 9999 //!< temporary value
+
 namespace ns3 {
 
 class Socket;
