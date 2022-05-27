@@ -36,6 +36,21 @@ public:
    */
   ReliableUdpVideoStreamClientHelper (Address addr);
 
+  /**
+   * Record an attribute to be set in each Application after it is created.
+   *
+   * \param name the name of the attribute to set
+   * \param value the value of the attribute to set
+   */
+  void SetAttribute (std::string name, const AttributeValue &value);
+
+  /**
+   * Create a ReliabeUdpVideoStreamClient application on each of the input nodes
+   
+   * \param c the nodes
+   * \return the applications created, one application per input node.
+   */
+  ApplicationContainer Install (NodeContainer c); 
 };
 
 } // namespace ns3
