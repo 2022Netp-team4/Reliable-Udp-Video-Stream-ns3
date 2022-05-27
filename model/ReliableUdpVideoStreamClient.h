@@ -22,7 +22,18 @@ namespace ns3 {
  */
 class ReliableUdpVideoStreamClient : public Application
 {
-
+public:
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+  
+  ReliableUdpVideoStreamClient();
+  
+  virtual ~ReliableUdpVideoStreamClient();
 };
+
 } // namespace ns3
+
 #endif /* RELIABLE_UDP_VIDEO_STREAM_CLIENT_H */
