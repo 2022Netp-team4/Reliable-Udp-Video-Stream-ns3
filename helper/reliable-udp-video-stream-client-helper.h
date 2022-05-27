@@ -17,12 +17,12 @@ class ReliableUdpVideoStreamClientHelper
 {
 public:
   /**
-   * Create ReliabeUdpVideoStreamClient which will make life easier for people trying to set up simulatios with reliable-udp-video-stream-server.
+   * \brief Create ReliabeUdpVideoStreamClient which will make life easier for people trying to set up simulatios with reliable-udp-video-stream-server.
    */
   ReliableUdpVideoStreamClientHelper ();
   
   /**
-   * Create ReliabeUdpVideoStreamClient which will make life easier for people trying to set up simulatios with reliable-udp-video-stream-server.
+   * \brief Create ReliabeUdpVideoStreamClient which will make life easier for people trying to set up simulatios with reliable-udp-video-stream-server.
    
    * \param ip The IP address of the remote UDP server
    * \param port The port number of the remote UDP server
@@ -30,14 +30,14 @@ public:
   ReliableUdpVideoStreamClientHelper (Address ip, uint16_t port);
 
   /**
-   * Create ReliabeUdpVideoStreamClient which will make life easier for people trying to set up simulatios with reliable-udp-video-stream-server.
+   * \brief Create ReliabeUdpVideoStreamClient which will make life easier for people trying to set up simulatios with reliable-udp-video-stream-server.
    
    * \param addr The address of the remote UDP server
    */
   ReliableUdpVideoStreamClientHelper (Address addr);
 
   /**
-   * Record an attribute to be set in each Application after it is created.
+   * \brief Record an attribute to be set in each Application after it is created.
    *
    * \param name the name of the attribute to set
    * \param value the value of the attribute to set
@@ -45,12 +45,30 @@ public:
   void SetAttribute (std::string name, const AttributeValue &value);
 
   /**
-   * Create a ReliabeUdpVideoStreamClient application on each of the input nodes
+   * \brief Create a ReliabeUdpVideoStreamClient application on each of the input container
    
-   * \param c the nodes
-   * \return the applications created, one application per input node.
+   * \param c NodeContainer of the set of nodes on which a ReliableUdpVideoStreamClient application will be installed.
+   * \return Container of Ptr to the applications installed.
    */
   ApplicationContainer Install (NodeContainer c); 
+
+  /**
+   * \brief Create a ReliableUdpVideoStreamClient application on each of the input container
+   
+   * \param node The node on which a ReliableUdpVideoStreamClient applicaton will be installed.
+   * \return Container of Ptr to the applications installed.
+   */
+  ApplicationContainer Install (Ptr<Node> node); 
+
+private:
+  /**
+   * \brief Install an ns3::ReliableUdpVideoStreamClient on the node configured with all the attributes set with SetAttribute.
+
+   * \param node The node on whch an ReliableUdpVideoStreamClient will be installed.
+   * \return Ptr to the application installed.
+   */
+  Ptr<Application> InstallPriv (Ptr<Node> node);
+  ObjectFactory m_factory; //!< Object factory
 };
 
 } // namespace ns3
