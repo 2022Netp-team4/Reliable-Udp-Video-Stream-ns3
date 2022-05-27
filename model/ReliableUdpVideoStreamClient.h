@@ -72,7 +72,22 @@ private:
    * This function is called by HandleRead.
 
    * \param packet received packet from server.
+   */
   void RemoveHeader (Ptr<Packet> packet);
+ 
+  /**
+   * \brief Store one or more in-order packets.
+ 
+   * This function is called periodically.
+   */
+  void StoreValidatePackets (void);
+
+  /**
+   * \brief Consume packets from queue which has in-order packets.
+
+   * This function is called periodically.
+   */
+  void ConsumePackets (void);
 };
 
 } // namespace ns3
