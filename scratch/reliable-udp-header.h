@@ -27,18 +27,20 @@ public:
   /**
    * \param seqNum A sequence number that server sends to client 
    */
-  void SetSeqNum (uint32_t m_seqNum);
+  void SetSeqNum (uint32_t seqNum);
 
   /**
    * \param ackNum An acknowledge number that client sends to server 
    */
-  void SetAckNum (uint32_t m_ackNum);
+  void SetAckNum (uint32_t ackNum);
 
   /**
    * \param signal Signal that client send to server to stop/resume sending.
    * ex) 0x00 for NO_SIGNAL, 0x01 for STOP, 0x02 for RESUME 
    */
-  void SetSignal (bool m_signal);
+  void SetSignal (uint8_t signal);
+
+  void SetRetransmit (uint8_t isRetransmit);
 
 
   /**
@@ -53,9 +55,10 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-  uint32_t m_seqNum;   //!< Sequence #
-  uint32_t m_ackNum;   //!< Ack #
-  uint8_t m_signal;    //!< Signal to stop/resume sending 
+  uint32_t m_seqNum;    //!< Sequence #
+  uint32_t m_ackNum;    //!< Ack #
+  uint8_t m_signal;     //!< Signal to stop/resume sending 
+  uint8_t m_isRetransmit; //!< Indicates wheter retransmit or not 
 };
 
 } // namespace ns3
