@@ -7,6 +7,7 @@
 #include "ns3/address.h"
 #include "ns3/traced-callback.h"
 #include "ns3/queue.h"
+#include <queue> // For stl priority queue 
 
 #define MAX_QUEUE_SIZE 9999 //!< temporary value
 
@@ -14,6 +15,13 @@ namespace ns3 {
 
 class Socket;
 class Packet;
+
+struct cmp {
+  bool operator()(Packet a, Packet b) {
+    return false;
+    // TODO: Implement comparison based on seq num 
+  }
+};
 
 /**
  * \ingroup applications
@@ -95,7 +103,7 @@ private:
   uint16_t m_peerPort; //!< Remote peer port
   Ptr<Queue<Packet>> m_outOfOrderQueue; //!< out-of-order packets queue
   Ptr<Queue<Packet>> m_inOrderQueue; //!< in-order queue
-  Ptr<Queue<Packet>> m_retransQueue; //!< retrasmitted packets queue
+  std::priority_queue<Packet, std::vector<Packet>, cmp> m_retransQueue; //!< retrasmitted packets queue
   EventId m_storeValidatePacketsEvent; //!< Event to store validate packets from out-of-order queue
   EventId m_consumePacketsEvent; //!< Event to consume packets from in-order queue   
 };
