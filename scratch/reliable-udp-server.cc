@@ -30,6 +30,7 @@ namespace ns3 {
 
     ReliableUdpServer::ReliableUdpServer() {
         NS_LOG_FUNCTION(this);
+        m_lastGeneratedSeqNum = -1;
     }
 
     ReliableUdpServer::~ReliableUdpServer() {
@@ -99,5 +100,24 @@ namespace ns3 {
                                        << " ack " << header.GetAckNum());
             }
         }
+    }
+
+    void
+    ReliableUdpServer::GeneratePackets() {
+        uint32_t packetSize = 1024;
+        uint8_t dataBuffer[packetSize];
+        Ptr <Packet> packet = Create<Packet>(dataBuffer, packetSize);
+
+        ReliableUdpHeader *header = new Header();
+        header->SetSeqNum(++m_lastGeneratedSeqNum);
+        header->SetRetransmit(0);
+
+        packet->AddHeader(header);
+        m_TxQueue->Enqueue(packet);
+    }
+
+    void
+    ReliableUdpServer::Send() {
+
     }
 }
