@@ -42,6 +42,13 @@ public:
 
   void SetRetransmit (uint8_t isRetransmit);
 
+  uint32_t GetSeqNum ();
+
+  uint32_t GetAckNum ();
+
+  uint8_t GetSignal ();
+
+  uint8_t GetRetransmit ();
 
   /**
    * \brief Get the type ID.
