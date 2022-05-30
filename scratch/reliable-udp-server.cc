@@ -86,5 +86,18 @@ namespace ns3 {
         Address from;
         Address localAddress;
         ReliableUdpHeader header;
+
+        while ((packet = socket->RecvFrom(from))) {
+            socket->GetSockName(localAddress);
+            packet->RemoveHeader(header);
+            if (InetSocketAddress::IsMatchingType(from)) {
+                NS_LOG_INFO("At time " << Simulator::Now().GetSeconds()
+                                       << "s server received " << packet->GetSize()
+                                       << " bytes from " << InetSocketAddress::ConvertFrom(from).GetIpv4()
+                                       << " port " << InetSocketAddress::ConvertFrom(from).GetPort()
+                                       << " seq " << header.GetSeqNum()
+                                       << " ack " << header.GetAckNum());
+            }
+        }
     }
 }
