@@ -7,6 +7,7 @@
 #include <map>
 
 #include "reliable-udp-server.h"
+#include "reliable-udp-header.h"
 
 namespace ns3 {
 
@@ -75,5 +76,15 @@ namespace ns3 {
             m_socket->Close();
             m_socket->SetRecvCallback(MakeNullCallback < void, Ptr < Socket > > ());
         }
+    }
+
+    void
+    ReliableUdpServer::HandleRead(Ptr <Socket> socket) {
+        NS_LOG_FUNCTION(this << socket)
+
+        Ptr <Packet> packet;
+        Address from;
+        Address localAddress;
+        ReliableUdpHeader header;
     }
 }
