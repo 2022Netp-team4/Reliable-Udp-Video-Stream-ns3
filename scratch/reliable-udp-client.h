@@ -7,6 +7,7 @@
 #include "ns3/address.h"
 #include "ns3/traced-callback.h"
 #include "ns3/queue.h"
+#include "reliable-udp-header.h"
 #include <queue> // For stl priority queue 
 
 #define MAX_QUEUE_SIZE 9999 //!< temporary value
@@ -18,8 +19,10 @@ class Packet;
 
 struct cmp {
   bool operator()(Packet a, Packet b) {
-    return false;
-    // TODO: Implement comparison based on seq num 
+    ReliableUdpHeader appHeaderA, appHeaderB;
+    a.RemoveHeader(appHeaderA);
+    b.RemoveHeader(appHeaderB);
+    return appHeaderA.GetSeqNum() < appHeaderB.GetSeqNum();
   }
 };
 
@@ -30,10 +33,10 @@ struct cmp {
 
 /**
  * \ingroup reliableudpclient
-
- * \brief A UDP client, receives UDP packets from a remote server in a reliable way.
- 
- * UDP packets are divided from frames and enqueued to particular queue when * they are not a retransmitted one. The retransmitted packets are enqueued  * to the other particular queue for reliability. 
+ * \brief A UDP client, receives UDP packets from a remote server in a reliable way. 
+ * UDP packets are divided from frames and enqueued to particular queue when 
+ * they are not a retransmitted one. The retransmitted packets are enqueued  
+ * to the other particular queue for reliability. 
  */
 class ReliableUdpClient : public Application
 {
@@ -82,7 +85,7 @@ private:
  
    * This function is called periodically.
    */
-  void StoreValidatePackets (void);
+  void RearrangePackets (void);
 
   /**
    * \brief Consume packets from queue which has in-order packets.
@@ -96,15 +99,19 @@ private:
 
    * This function is called when the queue which has out-of-order packets is full.
    */
-  void RequestStop(void);
+  void SendAck (uint32_t ackNum, uint8_t signal);
 
+  bool m_receiving;
   Ptr<Socket> m_socket; //!< Socket
   Address m_peerAddress; //!< Remote peer address
   uint16_t m_peerPort; //!< Remote peer port
+  uint32_t m_lastArrangedSeq;
+
   Ptr<Queue<Packet>> m_outOfOrderQueue; //!< out-of-order packets queue
   Ptr<Queue<Packet>> m_inOrderQueue; //!< in-order queue
-  std::priority_queue<Packet, std::vector<Packet>, cmp> m_retransQueue; //!< retrasmitted packets queue
-  EventId m_storeValidatePacketsEvent; //!< Event to store validate packets from out-of-order queue
+  //!< retrasmitted packets queue
+  std::priority_queue<Ptr<Packet>, std::vector<Ptr<Packet> >, cmp> m_retransQueue; 
+  EventId m_rearrangePacketsEvent; //!< Event to rearrange packets from out-of-order queue
   EventId m_consumePacketsEvent; //!< Event to consume packets from in-order queue   
 };
 
