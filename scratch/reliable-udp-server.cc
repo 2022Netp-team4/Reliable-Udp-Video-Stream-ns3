@@ -32,6 +32,7 @@ namespace ns3 {
         NS_LOG_FUNCTION(this);
         m_sending = true;
         m_lastGeneratedSeqNum = -1;
+        m_lastGeneratedSeqNum = -1;
     }
 
     ReliableUdpServer::~ReliableUdpServer() {
@@ -91,7 +92,7 @@ namespace ns3 {
 
         while ((packet = socket->RecvFrom(from))) {
             socket->GetSockName(localAddress);
-            packet->RemoveHeader(header);
+            packet->PeekHeader(header);
             if (InetSocketAddress::IsMatchingType(from)) {
                 NS_LOG_INFO("At time " << Simulator::Now().GetSeconds()
                                        << "s server received " << packet->GetSize()
@@ -99,6 +100,11 @@ namespace ns3 {
                                        << " port " << InetSocketAddress::ConvertFrom(from).GetPort()
                                        << " seq " << header.GetSeqNum()
                                        << " ack " << header.GetAckNum());
+            }
+            if (header.GetSignal()) {
+                m_sending = false
+            } else {
+                m_unAckedPackets.erase(header.GetAckNum());
             }
         }
     }
@@ -119,18 +125,21 @@ namespace ns3 {
 
     void
     ReliableUdpServer::Send() {
+        ReliableUdpHeader header;
         if (m_sending) {
-            if ((!m_unAckedPackets->IsEmpty())) {
-                while (!m_unAckedPackets->IsEmpty()) {
-                    Ptr <Packet> p = m_unAckedPackets->Peek();
+            if ((!m_unAckedPackets.emmpty())) {
+                for (Ptr <Packet> p: m_unAckedPackets.values()) {
                     m_socket->Send(p);
-                    m_unAckedPackets->Dequeue();
                 }
+                m_unAckedPackets.clear();
             } else {
                 while (!m_TxQueue->IsEmpty()) {
                     Ptr <Packet> p = m_TxQueue->Peek();
+                    p->PeekHeader(header);
                     m_socket->Send(p);
+                    m_lastSentSeqNum = header.GetSeqNum()
                     m_TxQueue->Dequeue();
+                    m_unAckedPackets[header.GetSeqNum()] = p;
                 }
             }
         }
