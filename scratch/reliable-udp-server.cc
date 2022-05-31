@@ -30,6 +30,7 @@ namespace ns3 {
 
     ReliableUdpServer::ReliableUdpServer() {
         NS_LOG_FUNCTION(this);
+        m_sending = true;
         m_lastGeneratedSeqNum = -1;
     }
 
@@ -118,6 +119,20 @@ namespace ns3 {
 
     void
     ReliableUdpServer::Send() {
-
+        if (m_sending) {
+            if ((!m_unAckedPackets->IsEmpty())) {
+                while (!m_unAckedPackets->IsEmpty()) {
+                    Ptr <Packet> p = m_unAckedPackets->Peek();
+                    m_socket->Send(p);
+                    m_unAckedPackets->Dequeue();
+                }
+            } else {
+                while (!m_TxQueue->IsEmpty()) {
+                    Ptr <Packet> p = m_TxQueue->Peek();
+                    m_socket->Send(p);
+                    m_TxQueue->Dequeue();
+                }
+            }
+        }
     }
 }
