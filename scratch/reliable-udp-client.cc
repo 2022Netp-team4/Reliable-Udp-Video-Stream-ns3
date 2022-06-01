@@ -13,7 +13,7 @@
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("ReliableUdpClientApplication");
-NS_OBJECT_ENSURE_REGISTERED (UdpEchoClient);
+NS_OBJECT_ENSURE_REGISTERED (ReliableUdpEchoClient);
 
 TypeId ReliableUdpClient::GetTypeId (void) 
 {
