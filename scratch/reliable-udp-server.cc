@@ -69,6 +69,14 @@ namespace ns3 {
         }
 
         m_socket->SetRecvCallback(MakeCallback(&ReliableUdpServer::HandleRead, this));
+        m_generatePacketEvent = Simulator::Schedule(
+                MilliSeconds(10),
+                &ReliableUdpServer::GeneratePackets, this
+        );
+        m_sendEvent = Simulator::Schedule(
+                MilliSeconds(33),
+                &ReliableUdpServer::Send, this
+        );
     }
 
     void
