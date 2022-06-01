@@ -138,12 +138,12 @@ namespace ns3 {
                 m_unAckedPackets.clear();
             } else {
                 while (!m_TxQueue->IsEmpty()) {
-                    Ptr <Packet> p = m_TxQueue->Peek();
+                    Ptr <Packet> p = m_TxQueue->Peek()->Copy();
                     p->PeekHeader(header);
                     m_socket->Send(p);
                     m_lastSentSeqNum = header.GetSeqNum();
                     m_TxQueue->Dequeue();
-                    m_unAckedPackets[header.GetSeqNum()] = p;
+                    m_unAckedPackets[header.GetSeqNum()] = *p;
                 }
             }
         }

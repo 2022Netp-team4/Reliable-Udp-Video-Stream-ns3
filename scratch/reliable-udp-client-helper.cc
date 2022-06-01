@@ -11,7 +11,7 @@ ReliableUdpClientHelper::ReliableUdpClientHelper() {
 ReliableUdpClientHelper::ReliableUdpClientHelper(Address address, uint16_t port) {
   m_factory.SetTypeId (ReliableUdpClient::GetTypeId());
   SetAttribute ("RemoteAddress", AddressValue (address));
-  SetAttribute ("RemortPort", UintegerValue (port));
+  SetAttribute ("RemotePort", UintegerValue (port));
 }
 
 void
@@ -33,11 +33,16 @@ ReliableUdpClientHelper::Install (NodeContainer c)
   return apps;
 }
 
-  Ptr<Application>
-  ReliableUdpClientHelper::InstallPriv(Ptr<Node> node) {
-      Ptr <Application> app = m_factory.Create<ReliableUdpClient>();
-      node->AddApplication(app);
-      return app;
-  }
+ApplicationContainer
+ReliableUdpClientHelper::Install(Ptr <Node> node) {
+  return ApplicationContainer(InstallPriv(node));
+}
+
+Ptr<Application>
+ReliableUdpClientHelper::InstallPriv(Ptr<Node> node) {
+    Ptr <Application> app = m_factory.Create<ReliableUdpClient>();
+    node->AddApplication(app);
+    return app;
+}
 }
 

@@ -160,7 +160,7 @@ ReliableUdpClient::RearrangePackets (void)
   // Check out-of-order queue if next packet exists 
   if (!m_outOfOrderQueue->IsEmpty()) {
     ReliableUdpHeader header;
-    Ptr<Packet> p = m_outOfOrderQueue->Peek();
+    Ptr<Packet> p = m_outOfOrderQueue->Peek()->Copy();
     p->RemoveHeader (header);
     // In-order; schedule and return 
     if (header.GetSeqNum() == m_lastArrangedSeq + 1) {
@@ -216,7 +216,7 @@ ReliableUdpClient::SendAck (uint32_t ackNum, uint8_t signal)
   ReliableUdpHeader ackHeader;
   ackHeader.SetAckNum (ackNum);
   ackHeader.SetSignal (signal);
-  Ptr<Packet> headerOnlyPacket = Create<Packet> (ackHeader.GetSerializedSize);
+  Ptr<Packet> headerOnlyPacket = Create<Packet> (ackHeader.GetSerializedSize());
   headerOnlyPacket->AddHeader (ackHeader);
   m_socket->Send (headerOnlyPacket);
 }

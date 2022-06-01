@@ -43,9 +43,9 @@ main (int argc, char *argv[])
 	Ipv4InterfaceContainer interfaces = addr.Assign(devices);
 
 	ReliableUdpClientHelper rclient(interfaces.GetAddress(1), 9);
-	rclient.SetAttribute("MaxPackets", UintegerValue(100000));
-	rclient.SetAttribute("Interval", TimeValue(Seconds(0.1)));
-	rclient.SetAttribute("PacketSize", UintegerValue(1024));
+	//rclient.SetAttribute("MaxPackets", UintegerValue(100000));
+	//rclient.SetAttribute("Interval", TimeValue(Seconds(0.1)));
+	//rclient.SetAttribute("PacketSize", UintegerValue(1024));
 
 	ApplicationContainer clientApps;
 	clientApps.Add(rclient.Install(nodes.Get(0)));

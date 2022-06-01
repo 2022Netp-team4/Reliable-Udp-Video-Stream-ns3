@@ -18,10 +18,10 @@ class Socket;
 class Packet;
 
 struct cmp {
-  bool operator()(Packet a, Packet b) {
+  bool operator()(Ptr<Packet> a, Ptr<Packet> b) {
     ReliableUdpHeader appHeaderA, appHeaderB;
-    a.RemoveHeader(appHeaderA);
-    b.RemoveHeader(appHeaderB);
+    a->RemoveHeader(appHeaderA);
+    b->RemoveHeader(appHeaderB);
     return appHeaderA.GetSeqNum() < appHeaderB.GetSeqNum();
   }
 };
