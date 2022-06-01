@@ -62,8 +62,6 @@ main (int argc, char *argv[])
 	Ptr<ErrorModel> em = factory.Create<ErrorModel> ();
 	devices.Get (1)->SetAttribute ("ReceiveErrorModel", PointerValue (em));
 
-
-
 	p2p.EnablePcapAll("master", false);
 
 	Simulator::Stop (Seconds (20));
