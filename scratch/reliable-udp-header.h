@@ -66,6 +66,10 @@ private:
   uint32_t m_ackNum;    //!< Ack #
   uint8_t m_signal;     //!< Signal to stop/resume sending 
   uint8_t m_isRetransmit; //!< Indicates wheter retransmit or not 
+  Address m_source;           
+  Address m_destination;      
+  uint8_t m_protocol; 
+          
 };
 
 } // namespace ns3
