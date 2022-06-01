@@ -2,19 +2,19 @@
 #include "reliable-udp-header.h"
 
 namespace ns3 {
-    
+
 ReliableUdpHeader::ReliableUdpHeader(){
-    m_seqNum(0),
-    m_ackNum(0),
-    m_signal(0),
-    m_isRetransmit(0)
+    m_seqNum=0,
+    m_ackNum=0,
+    m_signal=0,
+    m_isRetransmit=0
 }
 
 ReliableUdpHeader::~ReliableUdpHeader(){
     NS_LOG_FUNCTION(this);
 }
 
-TypeId 
+TypeId
  Header::GetTypeId(void) {
     static TypeId tid = TypeId("ns3::ReliableUdpHeader")
     .SetParent<Header> ()
@@ -23,24 +23,24 @@ TypeId
     return tid;
 }
 
-TypeId 
+TypeId
 ReliableUdpHeader::GetInstanceTypeId (void) const
 {
     return GetTypeId ();
 }
 
-void 
+void
 ReliableUdpHeader::Print (std::ostream &os) const
 {
   os << "header length: " << GetSerializedSize ()
-     << " " 
+     << " "
      << m_sourcePort << " > " << m_destinationPort
-     << "AckNum "<< m_ackNum << "SeqNum" << m_seqNum 
+     << "AckNum "<< m_ackNum << "SeqNum" << m_seqNum
      << "Retransmit" << m_isRetransmit << "Signal" << m_signal
   ;
 }
 
-uint32_t 
+uint32_t
 UdpHeader::GetSerializedSize (void) const
 {
   return 18;
@@ -65,7 +65,7 @@ UdpHeader::Deserialize (Buffer::Iterator start)
   m_ackNum = i.ReadU32 ();
   m_signal = i.ReadU8 ();
   m_isRetransmit = i.ReadU8 ();
-  
+
   return GetSerializedSize ();
 }
 
