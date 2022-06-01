@@ -82,7 +82,7 @@ private:
   uint32_t m_lastSentSeqNum;       //!< Sequence # of recently sent packet 
 
   // Packets waiting to be transmitted
-  Ptr<Queue<Packet>> m_TxQueue;  
+  Ptr<Queue<Packet> > m_TxQueue;  
 
   // Packets sent but not acked. This acts as a retransmission buffer. 
   // key: sequence #, value: packet 

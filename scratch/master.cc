@@ -20,7 +20,6 @@ NS_LOG_COMPONENT_DEFINE ("master");
 int 
 main (int argc, char *argv[])
 {
-
 	NodeContainer nodes;
 	nodes.Create(2);
 
@@ -49,13 +48,13 @@ main (int argc, char *argv[])
 
 	ApplicationContainer clientApps;
 	clientApps.Add(rclient.Install(nodes.Get(0)));
-	clientApps.Start(Seconds(1.0));
+	clientApps.Start(Seconds(0.0));
 	clientApps.Stop(Seconds(10.0));
 
 	ReliableUdpServerHelper rserver(9);
 	ApplicationContainer serverApps(rserver.Install(nodes.Get(1)));
-	serverApps.Start(Seconds(0));
-	serverApps.Stop(Seconds(11.0));
+	serverApps.Start(Seconds(1.0));
+	serverApps.Stop(Seconds(9.0));
 
 	ObjectFactory factory;
 	factory.SetTypeId (errorModelType);

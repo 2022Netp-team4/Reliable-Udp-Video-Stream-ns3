@@ -8,6 +8,7 @@
 #include "ns3/socket-factory.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
+#include "ns3/drop-tail-queue.h"
 #include "reliable-udp-client.h"
 
 namespace ns3 {
@@ -68,17 +69,23 @@ ReliableUdpClient::DoDispose (void)
 void
 ReliableUdpClient::StartApplication (void)
 {
+  if (m_outOfOrderQueue == 0) 
+    m_outOfOrderQueue = CreateObject<DropTailQueue<Packet> > ();
+  if (m_inOrderQueue == 0)
+    m_inOrderQueue = CreateObject<DropTailQueue<Packet> > ();
+
+  InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), 9);
   if (m_socket == 0) {
     TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
     m_socket = Socket::CreateSocket (GetNode (), tid);
 
     if (Ipv4Address::IsMatchingType(m_peerAddress) == true) {
-      if (m_socket->Bind () == -1) {
+      if (m_socket->Bind (local) == -1) {
         NS_FATAL_ERROR ("Failed to bind socket");
       }
       m_socket->Connect (InetSocketAddress(Ipv4Address::ConvertFrom(m_peerAddress), m_peerPort));
     } else if (InetSocketAddress::IsMatchingType(m_peerAddress) == true) {
-      if (m_socket->Bind () == -1) {
+      if (m_socket->Bind (local) == -1) {
         NS_FATAL_ERROR ("Failed to bind socket");
       }
       m_socket->Connect (m_peerAddress);
@@ -122,6 +129,7 @@ ReliableUdpClient::HandleRead (Ptr<Socket> socket)
       ReliableUdpHeader recvHeader;
       packet->RemoveHeader (recvHeader);
       uint8_t isRetransmit = recvHeader.GetRetransmit();
+      uint32_t seq = recvHeader.GetSeqNum();
 
       // As retransmit queue sorts packets using info in header, 
       // we should re-attach it. 
@@ -131,6 +139,7 @@ ReliableUdpClient::HandleRead (Ptr<Socket> socket)
       // For retransmitted packets, push into retransmit queue 
       if (isRetransmit) {
         m_retransQueue.push(packet);
+        std::cout << "ret " << seq << std::endl;
       // For regular packets, push into out-of-order queue 
       } else {
         if (false) {
@@ -138,6 +147,7 @@ ReliableUdpClient::HandleRead (Ptr<Socket> socket)
           signal = 0x01;
         } else {
           m_outOfOrderQueue->Enqueue(packet);
+          std::cout << "reg " << seq << std::endl;
         }
       }
       SendAck (recvHeader.GetSeqNum (), signal); 
@@ -202,8 +212,9 @@ ReliableUdpClient::ConsumePackets (void)
   // Dequeue packets from in-order queue 
   uint32_t nPackets = m_inOrderQueue->GetNPackets();
   if (nPackets >= 200) 
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < 200; i++) {
       m_inOrderQueue->Dequeue();
+    }
   m_consumePacketsEvent = Simulator::Schedule (
     MilliSeconds(33),
     &ReliableUdpClient::ConsumePackets, this

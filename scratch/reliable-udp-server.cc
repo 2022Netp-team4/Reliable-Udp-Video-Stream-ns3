@@ -8,6 +8,7 @@
 #include "ns3/address-utils.h"
 #include "ns3/udp-socket.h"
 #include "ns3/simulator.h"
+#include "ns3/drop-tail-queue.h"
 #include <map>
 
 #include "reliable-udp-server.h"
@@ -37,6 +38,7 @@ namespace ns3 {
         m_sending = true;
         m_lastGeneratedSeqNum = -1;
         m_lastGeneratedSeqNum = -1;
+        m_TxQueue = 0;
     }
 
     ReliableUdpServer::~ReliableUdpServer() {
@@ -54,6 +56,8 @@ namespace ns3 {
     ReliableUdpServer::StartApplication(void) {
         NS_LOG_FUNCTION(this);
 
+        if (m_TxQueue == 0) 
+            m_TxQueue = CreateObject<DropTailQueue<Packet> > ();
         if (m_socket == 0) {
             TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
             m_socket = Socket::CreateSocket(GetNode(), tid);
@@ -124,28 +128,39 @@ namespace ns3 {
 
         packet->AddHeader(header);
         m_TxQueue->Enqueue(packet);
+
+        m_generatePacketEvent = Simulator::Schedule(
+                MilliSeconds(10),
+                &ReliableUdpServer::GeneratePackets, this
+        );
     }
 
     void
     ReliableUdpServer::Send() {
+        InetSocketAddress client ("10.1.1.1", 9);
         ReliableUdpHeader header;
         if (m_sending) {
             if ((!m_unAckedPackets.empty())) {
                 for (std::map<uint32_t, Packet>::iterator it = m_unAckedPackets.begin(); 
                      it != m_unAckedPackets.end(); ++it) {
-                    m_socket->Send(&(it->second));
+                    m_socket->SendTo(&(it->second), 0, client);
                 }
                 m_unAckedPackets.clear();
             } else {
                 while (!m_TxQueue->IsEmpty()) {
                     Ptr <Packet> p = m_TxQueue->Peek()->Copy();
                     p->PeekHeader(header);
-                    m_socket->Send(p);
+                    m_socket->SendTo(p, 0, client);
                     m_lastSentSeqNum = header.GetSeqNum();
                     m_TxQueue->Dequeue();
                     m_unAckedPackets[header.GetSeqNum()] = *p;
                 }
             }
         }
+        m_sendEvent = Simulator::Schedule(
+            MilliSeconds(33),
+            &ReliableUdpServer::Send, this
+        );
     }
 }
+
