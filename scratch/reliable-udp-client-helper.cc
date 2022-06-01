@@ -5,11 +5,11 @@
 namespace ns3 {
 
 ReliableUdpClientHelper::ReliableUdpClientHelper() {
-  m_factory.SetTypeId (ReliableUdpClientHelper::GetTypeId());
+  m_factory.SetTypeId (ReliableUdpClient::GetTypeId());
 }
 
 ReliableUdpClientHelper::ReliableUdpClientHelper(Address address, uint16_t port) {
-  m_factory.SetTypeId (ReliableUdpClientHelper::GetTypeId());
+  m_factory.SetTypeId (ReliableUdpClient::GetTypeId());
   SetAttribute ("RemoteAddress", AddressValue (address));
   SetAttribute ("RemortPort", UintegerValue (port));
 }
