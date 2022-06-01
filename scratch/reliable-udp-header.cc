@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "reliable-udp-header.h"
 
 namespace ns3 {
     
