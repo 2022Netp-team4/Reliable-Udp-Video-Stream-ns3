@@ -13,7 +13,7 @@
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("ReliableUdpClientApplication");
-NS_OBJECT_ENSURE_REGISTERED (ReliableUdpEchoClient);
+NS_OBJECT_ENSURE_REGISTERED (ReliableUdpClient);
 
 TypeId ReliableUdpClient::GetTypeId (void) 
 {
@@ -25,10 +25,10 @@ TypeId ReliableUdpClient::GetTypeId (void)
                    "The destination Address of the outbound packets",
                    AddressValue (),
                    MakeAddressAccessor (&ReliableUdpClient::m_peerAddress),
-                   MakeAddressChecker<uint16_t> ())
+                   MakeAddressChecker ())
     .AddAttribute ("RemotePort", "The destination port of the outbound packets",
                    UintegerValue (100),
-                   MakeUintegerAccessor (&UdpClient::m_peerPort),
+                   MakeUintegerAccessor (&ReliableUdpClient::m_peerPort),
                    MakeUintegerChecker<uint16_t> ())
     ;
     return tid;
@@ -47,7 +47,7 @@ ReliableUdpClient::~ReliableUdpClient ()
 }
 
 void
-ReliableUdpClient::SetRemote (Addess ip, uint16_t port)
+ReliableUdpClient::SetRemote (Address ip, uint16_t port)
 {
   m_peerAddress = ip;
   m_peerPort = port;
@@ -87,11 +87,11 @@ ReliableUdpClient::StartApplication (void)
     }
   }
 
-  m_socket->SetReceiveCallback (MakeCallback (&ReliableUdpClient::HandleRead, this));
-  m_outOfOrderQueue.SetMaxSize (QueueSize (ns3::BYTES, MAX_QUEUE_SIZE));
+  m_socket->SetRecvCallback (MakeCallback (&ReliableUdpClient::HandleRead, this));
+  m_outOfOrderQueue->SetMaxSize (QueueSize (ns3::BYTES, MAX_QUEUE_SIZE));
   m_rearrangePacketsEvent = Simulator::Schedule (
     MilliSeconds(10), 
-    &ReliableUdpClient::RearrangePakets, this
+    &ReliableUdpClient::RearrangePackets, this
   );
   m_consumePacketsEvent = Simulator::Schedule (
     MilliSeconds(33),
@@ -102,7 +102,7 @@ ReliableUdpClient::StartApplication (void)
 void
 ReliableUdpClient::StopApplication (void) 
 {
-  Simulator::Cancel (m_storeValidatePacketsEvent);
+  Simulator::Cancel (m_rearrangePacketsEvent);
   Simulator::Cancel (m_consumePacketsEvent);
 }
 
@@ -133,7 +133,7 @@ ReliableUdpClient::HandleRead (Ptr<Socket> socket)
         m_retransQueue.push(packet);
       // For regular packets, push into out-of-order queue 
       } else {
-        if (m_outOfOrderQueue->WouldOverflow (1, packet->GetSize())) {
+        if (false) {
           m_receiving = false;
           signal = 0x01;
         } else {
@@ -146,11 +146,11 @@ ReliableUdpClient::HandleRead (Ptr<Socket> socket)
 }
 
 void
-ReliableUdpClient::RearrangePakets (void)
+ReliableUdpClient::RearrangePackets (void)
 {
   // If enough room is made in out-of-order queue, 
   // require to resume sending 
-  uint32_t queueSize = m_outOfOrderQueue->GetMaxSize();
+  uint32_t queueSize = m_outOfOrderQueue->GetMaxSize().GetValue();
   uint32_t occupied = m_outOfOrderQueue->GetNBytes();
   if (!m_receiving && queueSize - occupied > 4096) {
     m_receiving = true;
@@ -170,7 +170,7 @@ ReliableUdpClient::RearrangePakets (void)
 
       m_rearrangePacketsEvent = Simulator::Schedule(
         MilliSeconds(10), 
-        &ReliableUdpClient::RearrangePakets, this
+        &ReliableUdpClient::RearrangePackets, this
       );
       return;
     } 
@@ -192,7 +192,7 @@ ReliableUdpClient::RearrangePakets (void)
   // Repeat
   m_rearrangePacketsEvent = Simulator::Schedule (
     MilliSeconds(200), 
-    &ReliableUdpClient::RearrangePakets, this
+    &ReliableUdpClient::RearrangePackets, this
   );
 }
 

@@ -4,6 +4,10 @@
 #include "ns3/address.h"
 #include "ns3/traced-callback.h"
 #include "ns3/queue.h"
+#include "ns3/socket.h"
+#include "ns3/address-utils.h"
+#include "ns3/udp-socket.h"
+#include "ns3/simulator.h"
 #include <map>
 
 #include "reliable-udp-server.h"
@@ -20,7 +24,7 @@ namespace ns3 {
         static TypeId tid = TypeId("ns3::ReliableUdpServer")
                 .SetParent<Application>()
                 .SetGroupName("Applications")
-                .AddConstructor<ReliableUdp>()
+                .AddConstructor<ReliableUdpServer>()
                 .AddAttribute("Port", "Port on which we listen for incoming packets.",
                               UintegerValue(9),
                               MakeUintegerAccessor(&ReliableUdpServer::m_port),
@@ -57,15 +61,6 @@ namespace ns3 {
             if (m_socket->Bind(local) == -1) {
                 NS_FATAL_ERROR("Failed to bind socket");
             }
-            if (addressUtils::IsMulticast(m_local)) {
-                Ptr <UdpSocket> udpSocket = DynamicCast<UdpSocket>(m_socket);
-                if (udpSocket) {
-                    // equivalent to setsockopt (MCAST_JOIN_GROUP)
-                    udpSocket->MulticastJoinGroup(0, m_local);
-                } else {
-                    NS_FATAL_ERROR("Error: Failed to join multicast group");
-                }
-            }
         }
 
         m_socket->SetRecvCallback(MakeCallback(&ReliableUdpServer::HandleRead, this));
@@ -91,9 +86,9 @@ namespace ns3 {
 
     void
     ReliableUdpServer::HandleRead(Ptr <Socket> socket) {
-        NS_LOG_FUNCTION(this << socket)
+        NS_LOG_FUNCTION(this << socket);
 
-        Ptr <Packet> packet;
+        Ptr<Packet> packet;
         Address from;
         Address localAddress;
         ReliableUdpHeader header;
@@ -110,7 +105,7 @@ namespace ns3 {
                                        << " ack " << header.GetAckNum());
             }
             if (header.GetSignal()) {
-                m_sending = false
+                m_sending = false;
             } else {
                 m_unAckedPackets.erase(header.GetAckNum());
             }
@@ -123,9 +118,9 @@ namespace ns3 {
         uint8_t dataBuffer[packetSize];
         Ptr <Packet> packet = Create<Packet>(dataBuffer, packetSize);
 
-        ReliableUdpHeader *header = new Header();
-        header->SetSeqNum(++m_lastGeneratedSeqNum);
-        header->SetRetransmit(0);
+        ReliableUdpHeader header;
+        header.SetSeqNum(++m_lastGeneratedSeqNum);
+        header.SetRetransmit(0);
 
         packet->AddHeader(header);
         m_TxQueue->Enqueue(packet);
@@ -135,9 +130,10 @@ namespace ns3 {
     ReliableUdpServer::Send() {
         ReliableUdpHeader header;
         if (m_sending) {
-            if ((!m_unAckedPackets.emmpty())) {
-                for (Ptr <Packet> p: m_unAckedPackets.values()) {
-                    m_socket->Send(p);
+            if ((!m_unAckedPackets.empty())) {
+                for (std::map<uint32_t, Packet>::iterator it = m_unAckedPackets.begin(); 
+                     it != m_unAckedPackets.end(); ++it) {
+                    m_socket->Send(&(it->second));
                 }
                 m_unAckedPackets.clear();
             } else {
@@ -145,7 +141,7 @@ namespace ns3 {
                     Ptr <Packet> p = m_TxQueue->Peek();
                     p->PeekHeader(header);
                     m_socket->Send(p);
-                    m_lastSentSeqNum = header.GetSeqNum()
+                    m_lastSentSeqNum = header.GetSeqNum();
                     m_TxQueue->Dequeue();
                     m_unAckedPackets[header.GetSeqNum()] = p;
                 }

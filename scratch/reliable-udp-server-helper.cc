@@ -5,11 +5,11 @@
 namespace ns3 {
 
     ReliableUdpServerHelper::ReliableUdpServerHelper() {
-        m_factory.SetTypeId(ReliableUdpServerHelper::GetTypeId());
+        m_factory.SetTypeId(ReliableUdpServer::GetTypeId());
     }
 
     ReliableUdpServerHelper::ReliableUdpServerHelper(uint16_t port) {
-        m_factory.SetTypeId(ReliableUdpServerHelper::GetTypeId());
+        m_factory.SetTypeId(ReliableUdpServer::GetTypeId());
         SetAttribute("Port", UintegerValue(port));
     }
 
@@ -21,12 +21,12 @@ namespace ns3 {
     }
 
     ApplicationContainer
-    ReliableUdpServerHelper::Install(Ptr <Node> node) const {
+    ReliableUdpServerHelper::Install(Ptr <Node> node) {
         return ApplicationContainer(InstallPriv(node));
     }
 
     ApplicationContainer
-    ReliableUdpServerHelper::Install(NodeContainer c) const {
+    ReliableUdpServerHelper::Install(NodeContainer c) {
         ApplicationContainer apps;
         for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
             apps.Add(InstallPriv(*i));
@@ -36,8 +36,8 @@ namespace ns3 {
     }
 
     Ptr <Application>
-    ReliableUdpServerHelper::InstallPriv(Ptr <Node> node) const {
-        Ptr <Application> app = m_factory.Create<ReliableUdpServerHelper>();
+    ReliableUdpServerHelper::InstallPriv(Ptr <Node> node) {
+        Ptr <Application> app = m_factory.Create<ReliableUdpServer>();
         node->AddApplication(app);
 
         return app;

@@ -33,4 +33,11 @@ ReliableUdpClientHelper::Install (NodeContainer c)
   return apps;
 }
 
+  Ptr<Application>
+  ReliableUdpClientHelper::InstallPriv(Ptr<Node> node) {
+      Ptr <Application> app = m_factory.Create<ReliableUdpClient>();
+      node->AddApplication(app);
+      return app;
+  }
 }
+
