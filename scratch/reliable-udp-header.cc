@@ -1,17 +1,18 @@
 #include <stdint.h>
 #include "reliable-udp-header.h"
+#include "ns3/udp-header.h"
+
 
 namespace ns3 {
 
-ReliableUdpHeader::ReliableUdpHeader(){
-    m_seqNum=0,
-    m_ackNum=0,
-    m_signal=0,
-    m_isRetransmit=0
-}
+ReliableUdpHeader::ReliableUdpHeader() :
+    m_seqNum(0),
+    m_ackNum(0),
+    m_signal(0),
+    m_isRetransmit(0)
+{}
 
 ReliableUdpHeader::~ReliableUdpHeader(){
-    NS_LOG_FUNCTION(this);
 }
 
 TypeId
@@ -19,7 +20,7 @@ TypeId
     static TypeId tid = TypeId("ns3::ReliableUdpHeader")
     .SetParent<Header> ()
     .SetGroupName("Headers")
-    .AddConstructor<ReliableUdpHeader>()
+    .AddConstructor<ReliableUdpHeader>();
     return tid;
 }
 
@@ -29,16 +30,15 @@ ReliableUdpHeader::GetInstanceTypeId (void) const
     return GetTypeId ();
 }
 
-void
-ReliableUdpHeader::Print (std::ostream &os) const
-{
-  os << "header length: " << GetSerializedSize ()
-     << " "
-     << m_sourcePort << " > " << m_destinationPort
-     << "AckNum "<< m_ackNum << "SeqNum" << m_seqNum
-     << "Retransmit" << m_isRetransmit << "Signal" << m_signal
-  ;
-}
+// void
+// ReliableUdpHeader::Print (std::ostream &os) const
+// {
+//   os << "header length: " << GetSerializedSize ()     << " "
+//      << m_sourcePort << " > " << m_destinationPort
+//      << "AckNum "<< m_ackNum << "SeqNum" << m_seqNum
+//      << "Retransmit" << m_isRetransmit << "Signal" << m_signal
+//   ;
+// }
 
 uint32_t
 UdpHeader::GetSerializedSize (void) const
@@ -47,7 +47,7 @@ UdpHeader::GetSerializedSize (void) const
 }
 
 void
-UdpHeader::Serialize (Buffer::Iterator start) const
+ReliableUdpHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
 
@@ -58,7 +58,7 @@ UdpHeader::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-UdpHeader::Deserialize (Buffer::Iterator start)
+ReliableUdpHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
   m_seqNum = i.ReadU32 ();
@@ -69,35 +69,43 @@ UdpHeader::Deserialize (Buffer::Iterator start)
   return GetSerializedSize ();
 }
 
-void SetSeqNum (uint32_t seqNum){
+void 
+ReliableUdpHeader::SetSeqNum (uint32_t seqNum){
   m_seqNum = seqNum;
 }
 
-void SetAckNum (uint32_t ackNum){
+void 
+ReliableUdpHeader::SetAckNum (uint32_t ackNum){
   m_ackNum = ackNum;
 }
 
-void SetSignal (uint8_t signal){
+void 
+ReliableUdpHeader::SetSignal (uint8_t signal){
   m_signal = signal;
 }
 
-void SetRetransmit (uint8_t isRetransmit){
+void 
+ReliableUdpHeader::SetRetransmit (uint8_t isRetransmit){
   m_isRetransmit = isRetransmit;
 }
 
-uint32_t GetSeqNum (){
+uint32_t 
+ReliableUdpHeader::GetSeqNum (){
   return m_seqNum;
 }
 
-uint32_t GetAckNum (){
+uint32_t 
+ReliableUdpHeader::GetAckNum (){
   return m_ackNum;
 }
 
-uint8_t GetSignal (){
+uint8_t 
+ReliableUdpHeader::GetSignal (){
   return m_signal;
 }
 
-uint8_t GetRetransmit (){
+uint8_t 
+ReliableUdpHeader::GetRetransmit (){
   return m_isRetransmit;
 }
 
