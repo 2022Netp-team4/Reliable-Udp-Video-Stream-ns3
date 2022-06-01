@@ -6,7 +6,7 @@
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/reliable-udp-server.h"
+#include "reliable-udp-server.h"
 
 namespace ns3 {
 

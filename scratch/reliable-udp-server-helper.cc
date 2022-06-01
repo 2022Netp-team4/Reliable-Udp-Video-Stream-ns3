@@ -1,4 +1,4 @@
-#include "reliable-udp-server-helper.h.h"
+#include "reliable-udp-server-helper.h"
 #include "ns3/uinteger.h"
 #include "ns3/names.h"
 
